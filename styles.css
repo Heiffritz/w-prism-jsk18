@@ -1,0 +1,1607 @@
+/* styles.css
+   ------------------------------------------------------------------
+   PHASE 8: Full XP Luna theming. Every color/gradient below for OS
+   chrome (windows, taskbar, start menu, context menus, desktop)
+   reads from CSS custom properties defined by themeManager.js
+   (var(--titlebar-active-grad-start) etc) rather than hardcoding
+   hex values — that's what makes the theme actually swappable
+   instead of just "the Luna stylesheet". App CONTENT styling
+   (.app-about, .app-projects, etc, further down this file) is left
+   mostly as-is from Phases 5-7 since those are content panels, not
+   OS chrome, and the brief was specifically about making the OS
+   shell itself look like real XP Luna.
+   ------------------------------------------------------------------ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #001020;
+  font-family: var(--ui-font, Tahoma, Verdana, Arial, sans-serif);
+}
+
+/* ------------------------------------------------------------------
+   Window chrome — Luna titlebar gradient, rounded top corners,
+   beveled control buttons.
+   ------------------------------------------------------------------ */
+
+.prism-window {
+  background: var(--window-content-bg, #ece9d8);
+  border: 2px solid var(--titlebar-active-border, #1a4fae);
+  box-shadow: var(--window-shadow, 2px 2px 8px rgba(0, 0, 0, 0.4));
+  border-radius: var(--window-border-radius, 5px);
+  overflow: hidden;
+}
+
+/* A maximized window sits flush against the screen edges — no
+   rounded corners, no drop shadow, matching real OS behavior where
+   maximize visually "merges" the window with the desktop area. */
+.prism-window.maximized {
+  border-radius: 0;
+  box-shadow: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+}
+
+.prism-window.maximized .prism-window-titlebar {
+  border-radius: 0;
+}
+
+.prism-window-titlebar {
+  background: linear-gradient(
+    to bottom,
+    var(--titlebar-inactive-grad-start, #9db3e0),
+    var(--titlebar-inactive-grad-end, #7a8bb8)
+  );
+  color: var(--titlebar-inactive-text, #dde4f4);
+  font-size: 12px;
+  font-weight: bold;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  padding-left: 4px;
+  /* Luna's titlebar only rounds the TOP corners — the window body
+     below stays square against the content panel. -1px compensates
+     for the window's own 2px border so the radii nest cleanly. */
+  border-radius: calc(var(--window-border-radius, 5px) - 1px) calc(var(--window-border-radius, 5px) - 1px) 0 0;
+}
+
+.prism-window.active .prism-window-titlebar {
+  background: linear-gradient(
+    to bottom,
+    var(--titlebar-active-grad-start, #3d94f2) 0%,
+    var(--titlebar-active-grad-mid, #2674e8) 50%,
+    var(--titlebar-active-grad-end, #0c5dd6) 100%
+  );
+  color: var(--titlebar-active-text, #ffffff);
+}
+
+.prism-window-titletext {
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.2px;
+}
+
+.prism-window-titletext img {
+  vertical-align: middle;
+}
+
+.prism-window-controls {
+  gap: 2px;
+  padding-right: 3px;
+}
+
+.prism-window-controls .prism-window-btn {
+  width: 21px;
+  height: 19px;
+  margin: auto 0;
+  border-radius: 2px;
+  border: 1px solid var(--winbtn-border, #1a4fae);
+  background: linear-gradient(
+    to bottom,
+    var(--winbtn-grad-start, #4f9eea),
+    var(--winbtn-grad-end, #2a6fd0)
+  );
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.55), 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.prism-window-controls .prism-window-btn:hover {
+  filter: brightness(1.12);
+  background: linear-gradient(
+    to bottom,
+    var(--winbtn-grad-start, #4f9eea),
+    var(--winbtn-grad-end, #2a6fd0)
+  );
+}
+
+.prism-window-controls .prism-window-btn:active {
+  filter: brightness(0.9);
+}
+
+/* The close (×) button gets Luna's distinct red treatment — it's
+   always the rightmost control button. */
+.prism-window-controls .prism-window-btn:last-child {
+  background: linear-gradient(
+    to bottom,
+    var(--winbtn-close-grad-start, #f08a78),
+    var(--winbtn-close-grad-end, #d63a28)
+  );
+}
+
+.prism-window-content {
+  background: var(--window-content-bg, #ece9d8);
+  color: #000000;
+  /* Suggestion #1: content taller than the window scrolls instead of
+     being clipped or overflowing the window's bounds. WindowManager
+     also sets this inline at creation time (overflow:auto) — this
+     stylesheet rule makes the same intent explicit and keeps it
+     consistent with the rest of the OS's "CSS owns visuals" pattern
+     from Phase 8, and acts as a fallback in case an app's own inner
+     markup ever clears the inline style. */
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Establishes a positioning context for any app that uses
+     position:absolute children scoped to its own window (e.g. the
+     minigame's Matrix-rain canvas + CRT overlay, suggestion #8).
+     Without this, an app's absolutely-positioned element would
+     escape to the page's root containing block instead of staying
+     within its own window — harmless for every app that doesn't use
+     absolute positioning, since this has no visible effect unless a
+     descendant actually opts into position:absolute/fixed-relative-to-this. */
+  position: relative;
+}
+
+/* ------------------------------------------------------------------
+   PHASE 3: Desktop runtime surface (desktop, taskbar, start menu,
+   context menu). Still placeholder-level visuals — Phase 8 applies
+   the real XP/Vista skin (Aero blur, Luna gradients, icon artwork).
+   ------------------------------------------------------------------ */
+
+:root {
+  --taskbar-height: 40px;
+}
+
+#window-layer {
+  z-index: 100; /* above desktop (0), below taskbar/start/context menu */
+}
+
+.prism-desktop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100% - var(--taskbar-height));
+  /* Wallpaper override (Settings app) takes priority; falls back to
+     the active theme's own default; falls back to a hardcoded
+     gradient if even ThemeManager hasn't run yet for some reason. */
+  background: var(--desktop-bg-override, var(--desktop-bg, radial-gradient(circle at 30% 20%, #2a5298, #0a1330 75%)));
+  z-index: 0;
+  overflow: hidden;
+}
+
+.prism-desktop-icons {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 4px;
+  padding: 16px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.prism-desktop-icon {
+  width: 76px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  cursor: default;
+  user-select: none;
+}
+
+.prism-desktop-icon.selected {
+  background: rgba(60, 120, 220, 0.35);
+  border: 1px dotted rgba(255, 255, 255, 0.6);
+}
+
+.prism-desktop-icon-glyph {
+  width: 32px;
+  height: 32px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.prism-desktop-icon-label {
+  color: #ffffff;
+  font-size: 11px;
+  text-align: center;
+  text-shadow: var(--desktop-icon-label-shadow, 0 1px 2px rgba(0, 0, 0, 0.8));
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+/* Taskbar -------------------------------------------------------- */
+
+.prism-taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--taskbar-height);
+  background: linear-gradient(
+    to bottom,
+    var(--taskbar-grad-start, #245edb) 0%,
+    var(--taskbar-grad-start, #245edb) 45%,
+    var(--taskbar-grad-end, #0c2a8a) 100%
+  );
+  border-top: 1px solid var(--taskbar-border-top, #5b8cf0);
+  box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.15) inset;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 6px;
+  z-index: 999990;
+  box-sizing: border-box;
+}
+
+.prism-start-button {
+  position: relative;
+  height: 30px;
+  padding: 0 16px 0 8px;
+  border-radius: 5px 12px 12px 5px;
+  border: 1px solid var(--startbtn-border, #1a5c1a);
+  background: linear-gradient(
+    to bottom,
+    var(--startbtn-grad-start, #7ed957) 0%,
+    var(--startbtn-grad-mid, #3fae3f) 55%,
+    var(--startbtn-grad-end, #1d7a1d) 100%
+  );
+  color: var(--startbtn-text, #ffffff);
+  cursor: pointer;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6), 0 1px 2px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prism-start-flag {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+}
+
+.prism-start-label {
+  font-weight: bold;
+  font-size: 14px;
+  font-style: italic;
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+}
+
+/* Luna's Start button has a glossy highlight band across its top
+   third — a thin, brighter overlay rather than a separate element,
+   kept purely decorative and non-interactive via pointer-events:none. */
+.prism-start-button::before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 4px;
+  right: 4px;
+  height: 40%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0));
+  border-radius: 4px 10px 0 0;
+  pointer-events: none;
+}
+
+.prism-start-button:hover {
+  filter: brightness(1.08);
+}
+
+.prism-start-button:active {
+  filter: brightness(0.92);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.prism-taskbar-buttons {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  height: 100%;
+  align-items: center;
+}
+
+.prism-taskbar-app-button {
+  height: 26px;
+  min-width: 120px;
+  max-width: 200px;
+  padding: 0 10px;
+  border-radius: 3px;
+  border: 1px solid var(--taskbar-btn-border, #1c3f8f);
+  background: linear-gradient(to bottom, var(--taskbar-btn-bg, #3a6ed4), var(--taskbar-btn-bg, #3a6ed4));
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 12px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.prism-taskbar-app-button.active {
+  background: var(--taskbar-btn-active-bg, #14306e);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.prism-taskbar-app-button.minimized {
+  opacity: 0.7;
+}
+
+.prism-taskbar-clock {
+  color: #fff;
+  font-size: 12px;
+  padding: 0 10px;
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+/* Start menu ------------------------------------------------------ */
+
+.prism-start-menu {
+  position: fixed;
+  left: 4px;
+  bottom: calc(var(--taskbar-height) + 4px);
+  width: 430px;
+  max-height: 480px;
+  background: var(--startmenu-side-bg, #ffffff);
+  border: 2px solid var(--ctxmenu-border, #0a246a);
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+  border-radius: 8px 8px 4px 4px;
+  flex-direction: column;
+  z-index: 999995;
+  overflow: hidden;
+}
+
+.prism-start-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(
+    to right,
+    var(--startmenu-header-grad-start, #3d94f2),
+    var(--startmenu-header-grad-end, #0c5dd6)
+  );
+  padding: 10px 14px;
+}
+
+.prism-start-menu-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  background: linear-gradient(to bottom right, #fff3c4, #e8a33d);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #7a4a00;
+  flex-shrink: 0;
+}
+
+.prism-start-menu-username {
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.prism-start-menu-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.prism-start-menu-panel-left {
+  flex: 1.3;
+  background: var(--startmenu-side-bg, #ffffff);
+  border-right: 1px solid #c0c0c0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.prism-start-menu-panel-right {
+  flex: 1;
+  background: #d8e5f7;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 6px;
+  overflow-y: auto;
+}
+
+.prism-start-menu-list {
+  overflow-y: auto;
+  padding: 6px;
+  flex: 1;
+}
+
+.prism-start-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #000;
+}
+
+.prism-start-menu-item:hover {
+  background: var(--startmenu-hover-bg, #3a6ea5);
+  color: var(--startmenu-hover-text, #fff);
+}
+
+.prism-start-menu-item-glyph {
+  width: 22px;
+  height: 22px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.prism-start-menu-places {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.prism-start-menu-places-divider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.15);
+  margin: 8px 4px;
+}
+
+.prism-start-menu-places-bottom {
+  margin-top: auto;
+}
+
+.prism-start-menu-place {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #0a246a;
+  font-weight: 600;
+}
+
+.prism-start-menu-place:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.prism-start-menu-place.disabled {
+  color: #8aa0bc;
+  cursor: default;
+}
+
+.prism-start-menu-place.disabled:hover {
+  background: none;
+}
+
+.prism-start-menu-place-glyph {
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.prism-start-menu-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px 10px;
+  background: linear-gradient(
+    to right,
+    var(--startmenu-header-grad-start, #3d94f2),
+    var(--startmenu-header-grad-end, #0c5dd6)
+  );
+  border-top: 1px solid #b8c8e0;
+}
+
+.prism-start-menu-footer-btn {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: bold;
+  border: 1px solid #8aa0bc;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #fff, #dce8f5);
+  cursor: pointer;
+  color: #0a246a;
+}
+
+.prism-start-menu-footer-btn:hover {
+  background: linear-gradient(to bottom, #fff, #c5d9f5);
+}
+
+.prism-start-menu-footer-btn-danger {
+  color: #a02020;
+}
+
+/* Context menu ----------------------------------------------------- */
+
+.prism-context-menu {
+  background: var(--ctxmenu-bg, #ece9d8);
+  border: 1px solid var(--ctxmenu-border, #0a246a);
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  min-width: 160px;
+  padding: 3px;
+  font-size: 13px;
+  color: #000;
+}
+
+.prism-context-menu-item {
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.prism-context-menu-item:hover {
+  background: var(--ctxmenu-hover-bg, #3a6ea5);
+  color: var(--ctxmenu-hover-text, #fff);
+}
+
+.prism-context-menu-item.disabled {
+  color: #999;
+  cursor: default;
+}
+
+.prism-context-menu-separator {
+  height: 1px;
+  background: #c0c0c0;
+  margin: 3px 4px;
+}
+
+/* ------------------------------------------------------------------
+   Bootloader — full-screen splash shown while the kernel boots.
+   Deliberately simple (dark background, centered logo mark, a
+   single indeterminate progress bar) — modeled on the spirit of an
+   XP/Vista boot screen rather than recreating either pixel-for-pixel,
+   since this screen exists for only ~1 second and isn't OS chrome
+   the person will look at closely.
+   ------------------------------------------------------------------ */
+
+.prism-bootloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  background: radial-gradient(circle at 50% 40%, #0a1a3a 0%, #000810 75%);
+  color: #d8e4f5;
+  font-family: var(--ui-font, Tahoma, Verdana, Arial, sans-serif);
+  transition: opacity 0.4s ease-out;
+}
+
+.prism-bootloader-fadeout {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.prism-bootloader-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.prism-bootloader-logo-mark {
+  font-size: 40px;
+  color: #5fa8e0;
+  text-shadow: 0 0 18px rgba(95, 168, 224, 0.7);
+  letter-spacing: -4px;
+}
+
+.prism-bootloader-logo-text {
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  color: #c8d8ee;
+}
+
+.prism-bootloader-logo-text strong {
+  color: #ffffff;
+}
+
+.prism-bootloader-bar {
+  width: 220px;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.prism-bootloader-bar-fill {
+  width: 40%;
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(to right, #2a6cb8, #5fa8e0, #2a6cb8);
+  animation: prism-bootloader-indeterminate 1.1s ease-in-out infinite;
+}
+
+@keyframes prism-bootloader-indeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(280%); }
+}
+
+.prism-bootloader-status {
+  font-size: 11px;
+  color: #8aa4c8;
+  letter-spacing: 0.3px;
+}
+
+/* ------------------------------------------------------------------
+   PHASE 5: portfolio app content styling. Still placeholder-level —
+   real XP/Vista chrome (fonts, bevels, color depth) arrives Phase 8.
+   These rules only style each app's CONTENT, never window chrome
+   itself (that remains exclusively WindowManager's responsibility).
+   ------------------------------------------------------------------ */
+
+.app-about,
+.app-skills,
+.app-contact {
+  padding: 16px;
+  font-size: 13px;
+  color: #111;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* About ------------------------------------------------------------ */
+
+.app-about-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.app-about-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(to bottom right, #3a6ea5, #0a246a);
+  color: #fff;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.app-about-name {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.app-about-role {
+  color: #555;
+  font-size: 12px;
+}
+
+.app-about-body p {
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.app-about-footer {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.app-about-btn {
+  padding: 6px 14px;
+  font-size: 12px;
+  border: 1px solid #0a246a;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #f5f5f5, #d8d8d8);
+  cursor: pointer;
+}
+
+.app-about-btn:hover {
+  background: linear-gradient(to bottom, #e8f0fc, #c5d9f5);
+}
+
+.app-about-btn:active {
+  background: #b8cce8;
+}
+
+/* Projects ----------------------------------------------------------- */
+
+.app-projects {
+  display: flex;
+  height: 100%;
+}
+
+.app-projects-list {
+  width: 160px;
+  flex-shrink: 0;
+  border-right: 1px solid #c0c0c0;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.app-projects-list-item {
+  padding: 8px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.app-projects-list-item:hover {
+  background: #e8f0fc;
+}
+
+.app-projects-list-item.selected {
+  background: #3a6ea5;
+  color: #fff;
+}
+
+.app-projects-detail {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  font-size: 13px;
+}
+
+.app-projects-detail-empty {
+  color: #888;
+  font-style: italic;
+}
+
+.app-projects-detail-title {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #0a246a;
+}
+
+.app-projects-detail-blurb {
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.app-projects-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.app-projects-tag {
+  background: #ece9d8;
+  border: 1px solid #c0c0c0;
+  border-radius: 10px;
+  padding: 3px 10px;
+  font-size: 11px;
+  color: #333;
+}
+
+/* Skills -------------------------------------------------------------- */
+
+.app-skills-section {
+  margin-bottom: 16px;
+}
+
+.app-skills-section-title {
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: #0a246a;
+  border-bottom: 1px solid #c0c0c0;
+  padding-bottom: 4px;
+}
+
+.app-skills-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.app-skills-chip {
+  background: linear-gradient(to bottom, #f5f5f5, #e0e0e0);
+  border: 1px solid #aaa;
+  border-radius: 3px;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+/* Contact -------------------------------------------------------------- */
+
+.app-contact-info p {
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+
+.app-contact-divider {
+  border: none;
+  border-top: 1px solid #c0c0c0;
+  margin: 12px 0;
+}
+
+.app-contact-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-contact-label {
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 3px;
+  margin-top: 8px;
+}
+
+.app-contact-input,
+.app-contact-textarea {
+  font-family: inherit;
+  font-size: 12px;
+  padding: 5px 7px;
+  border: 1px solid #888;
+  border-radius: 2px;
+  background: #fff;
+  resize: vertical;
+}
+
+.app-contact-input:focus,
+.app-contact-textarea:focus {
+  outline: 2px solid #3a6ea5;
+  outline-offset: -1px;
+}
+
+.app-contact-submit {
+  margin-top: 12px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: bold;
+  border: 1px solid #0a246a;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #5fae5f, #2d7a2d);
+  color: #fff;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.app-contact-submit:hover {
+  background: linear-gradient(to bottom, #6fc46f, #3a8f3a);
+}
+
+.app-contact-status {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #1d7a1d;
+}
+
+.app-contact-status.error {
+  color: #c0392b;
+}
+
+/* ------------------------------------------------------------------
+   PHASE 6: media app content styling (Gallery, Certificates). Still
+   placeholder-level — real XP/Vista chrome arrives Phase 8.
+   ------------------------------------------------------------------ */
+
+.app-gallery {
+  height: 100%;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.app-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  padding: 14px;
+}
+
+.app-gallery-thumb {
+  cursor: pointer;
+  border: 1px solid #c0c0c0;
+  border-radius: 3px;
+  padding: 6px;
+  background: #f7f7f7;
+  text-align: center;
+}
+
+.app-gallery-thumb:hover {
+  border-color: #3a6ea5;
+  background: #e8f0fc;
+}
+
+.app-gallery-thumb-img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 2px;
+  background: #ddd;
+  display: block;
+}
+
+.app-gallery-thumb-caption {
+  font-size: 11px;
+  margin-top: 6px;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-gallery-viewer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.app-gallery-back {
+  align-self: flex-start;
+  margin-bottom: 10px;
+  padding: 5px 12px;
+  font-size: 12px;
+  border: 1px solid #888;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #f5f5f5, #ddd);
+  cursor: pointer;
+}
+
+.app-gallery-back:hover {
+  background: linear-gradient(to bottom, #e8f0fc, #c5d9f5);
+}
+
+.app-gallery-viewer-image-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a1a;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.app-gallery-viewer-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.app-gallery-viewer-caption {
+  text-align: center;
+  font-size: 12px;
+  color: #333;
+  margin-top: 8px;
+}
+
+/* Certificates --------------------------------------------------------- */
+
+.app-certificates {
+  display: flex;
+  height: 100%;
+}
+
+.app-certificates-list {
+  width: 190px;
+  flex-shrink: 0;
+  border-right: 1px solid #c0c0c0;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.app-certificates-list-item {
+  padding: 9px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.app-certificates-list-item:hover {
+  background: #e8f0fc;
+}
+
+.app-certificates-list-item.selected {
+  background: #3a6ea5;
+  color: #fff;
+}
+
+.app-certificates-viewer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.app-certificates-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #ece9d8;
+  border-bottom: 1px solid #c0c0c0;
+  font-size: 12px;
+}
+
+.app-certificates-current-title {
+  font-weight: bold;
+  color: #0a246a;
+}
+
+.app-certificates-download {
+  padding: 4px 10px;
+  font-size: 11px;
+  border: 1px solid #0a246a;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #f5f5f5, #d8d8d8);
+  color: #0a246a;
+  text-decoration: none;
+}
+
+.app-certificates-download:hover {
+  background: linear-gradient(to bottom, #e8f0fc, #c5d9f5);
+}
+
+.app-certificates-frame-wrap {
+  flex: 1;
+  position: relative;
+  background: #555;
+}
+
+.app-certificates-empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ddd;
+  font-size: 12px;
+  text-align: center;
+  width: 80%;
+}
+
+.app-certificates-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+/* ------------------------------------------------------------------
+   Suggestion #8: minigame ("Prism System Recovery") overhauled to a
+   Matrix-style terminal aesthetic — black background, glowing green
+   monospace text, a falling-character rain canvas behind the UI, and
+   a subtle CRT scanline overlay. All game LOGIC is unchanged; this
+   block is purely visual.
+   ------------------------------------------------------------------ */
+
+/* When a window's content panel hosts the minigame, give IT the
+   solid black background (rather than .app-minigame, which is now
+   transparent so the rain canvas underneath it stays visible). Using
+   :has() scopes this to ONLY windows containing the minigame's rain
+   canvas — every other app keeps the normal --window-content-bg.
+   .has-minigame-rain is a JS-applied fallback class for the rare
+   browser without :has() support — see minigame.app.js's _startRain. */
+.prism-window-content:has(.app-minigame-rain-canvas),
+.prism-window-content.has-minigame-rain {
+  background: #000000;
+}
+
+.app-minigame {
+  height: 100%;
+  background: transparent;
+  color: #33ff66;
+  font-family: "Courier New", Consolas, monospace;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+
+/* The rain canvas sits behind everything (z-index 0), the CRT
+   scanline overlay sits above the rain but behind the real UI
+   (z-index 1), and the actual game UI (.app-minigame) sits on top of
+   both via its own z-index:2 (set above). All three are siblings
+   inside .prism-window-content, which is given position:relative
+   (see that rule, above in this file) specifically so position:
+   absolute works correctly here instead of escaping to the page root. */
+.app-minigame-rain-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0.55;
+}
+
+.app-minigame-crt-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 1px,
+    rgba(0, 0, 0, 0.18) 2px,
+    rgba(0, 0, 0, 0.18) 3px
+  );
+  mix-blend-mode: multiply;
+}
+
+.app-minigame-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  gap: 10px;
+}
+
+.app-minigame-title {
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #5fff8a;
+  text-shadow: 0 0 6px rgba(95, 255, 138, 0.85), 0 0 14px rgba(51, 255, 102, 0.5);
+}
+
+.app-minigame-win .app-minigame-title {
+  color: #aaffc0;
+  text-shadow: 0 0 8px rgba(170, 255, 192, 0.9), 0 0 20px rgba(95, 255, 138, 0.6);
+}
+
+.app-minigame-lose .app-minigame-title {
+  color: #ff4444;
+  text-shadow: 0 0 8px rgba(255, 68, 68, 0.8), 0 0 18px rgba(255, 0, 0, 0.5);
+}
+
+.app-minigame-desc {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #2fdc5f;
+  max-width: 340px;
+  text-shadow: 0 0 3px rgba(51, 255, 102, 0.4);
+}
+
+.app-minigame-highscore,
+.app-minigame-final-score {
+  font-size: 13px;
+  color: #5fff8a;
+}
+
+.app-minigame-btn {
+  margin-top: 8px;
+  padding: 9px 20px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  border: 1px solid #33ff66;
+  border-radius: 2px;
+  background: rgba(51, 255, 102, 0.08);
+  color: #5fff8a;
+  text-shadow: 0 0 4px rgba(95, 255, 138, 0.7);
+  cursor: pointer;
+}
+
+.app-minigame-btn:hover {
+  background: rgba(51, 255, 102, 0.2);
+  box-shadow: 0 0 12px rgba(51, 255, 102, 0.5);
+}
+
+/* In-game HUD + grid ------------------------------------------------ */
+
+.app-minigame-hud {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  color: #5fff8a;
+  background: rgba(0, 20, 8, 0.6);
+  border-bottom: 1px solid rgba(51, 255, 102, 0.3);
+  text-shadow: 0 0 4px rgba(51, 255, 102, 0.5);
+}
+
+.app-minigame-status {
+  text-align: center;
+  font-size: 12px;
+  color: #2fdc5f;
+  padding: 10px 0 4px;
+  letter-spacing: 0.5px;
+}
+
+.app-minigame-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  padding: 20px;
+}
+
+.app-minigame-module {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #1a6633;
+  border-radius: 3px;
+  background: rgba(0, 15, 5, 0.7);
+  color: #33ff66;
+  cursor: pointer;
+  transition: background 0.1s, box-shadow 0.1s, border-color 0.1s;
+}
+
+.app-minigame-module:hover {
+  border-color: #33ff66;
+  box-shadow: 0 0 8px rgba(51, 255, 102, 0.3) inset;
+}
+
+.app-minigame-module.flash {
+  background: rgba(51, 255, 102, 0.25);
+  border-color: #aaffc0;
+  color: #ffffff;
+  box-shadow: 0 0 22px rgba(51, 255, 102, 0.85);
+}
+
+.app-minigame-module-glyph {
+  font-size: 28px;
+  text-shadow: 0 0 6px rgba(51, 255, 102, 0.6);
+}
+
+.app-minigame-module-label {
+  font-size: 10px;
+  letter-spacing: 1px;
+  font-family: "Courier New", Consolas, monospace;
+}
+
+/* Fake error popups -------------------------------------------------- */
+
+.app-minigame-popup-layer {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.app-minigame-popup {
+  pointer-events: auto;
+  width: 220px;
+  background: rgba(0, 10, 4, 0.92);
+  color: #5fff8a;
+  border: 1px solid #33ff66;
+  border-radius: 2px;
+  box-shadow: 0 0 16px rgba(51, 255, 102, 0.4);
+  font-family: "Courier New", Consolas, monospace;
+  overflow: hidden;
+  animation: app-minigame-popup-in 0.15s ease-out;
+}
+
+@keyframes app-minigame-popup-in {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.app-minigame-popup-title {
+  background: rgba(51, 255, 102, 0.15);
+  border-bottom: 1px solid rgba(51, 255, 102, 0.4);
+  color: #aaffc0;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  padding: 5px 8px;
+  text-shadow: 0 0 4px rgba(170, 255, 192, 0.6);
+}
+
+.app-minigame-popup-body {
+  padding: 8px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.app-minigame-popup-dismiss {
+  display: block;
+  width: calc(100% - 16px);
+  margin: 0 8px 8px;
+  padding: 4px;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  font-family: inherit;
+  border: 1px solid #33ff66;
+  border-radius: 2px;
+  background: rgba(51, 255, 102, 0.08);
+  color: #5fff8a;
+  cursor: pointer;
+}
+
+.app-minigame-popup-dismiss:hover {
+  background: rgba(51, 255, 102, 0.22);
+}
+
+/* ------------------------------------------------------------------
+   Settings app — theme + wallpaper swatch picker.
+   ------------------------------------------------------------------ */
+
+.app-settings {
+  padding: 16px;
+  font-size: 13px;
+  color: #111;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.app-settings-section {
+  margin-bottom: 20px;
+}
+
+.app-settings-section-title {
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 10px;
+  color: #0a246a;
+  border-bottom: 1px solid #c0c0c0;
+  padding-bottom: 4px;
+}
+
+.app-settings-swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+}
+
+.app-settings-swatch {
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  padding: 4px;
+  text-align: center;
+}
+
+.app-settings-swatch:hover {
+  border-color: #9db3e0;
+}
+
+.app-settings-swatch.active {
+  border-color: #0c5dd6;
+  background: #e8f0fc;
+}
+
+.app-settings-swatch-preview {
+  width: 100%;
+  height: 50px;
+  border-radius: 3px;
+  border: 1px solid #999;
+  margin-bottom: 5px;
+}
+
+.app-settings-swatch-label {
+  font-size: 11px;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-settings-note {
+  font-size: 11px;
+  color: #777;
+  font-style: italic;
+  margin-top: 8px;
+}
+
+.app-settings-text {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.app-settings-action-btn {
+  padding: 6px 14px;
+  font-size: 12px;
+  border: 1px solid #1a4fae;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #f5f5f5, #dce8f5);
+  cursor: pointer;
+  color: #0a246a;
+}
+
+.app-settings-action-btn:hover {
+  background: linear-gradient(to bottom, #e8f0fc, #c5d9f5);
+}
+
+.app-settings-manual-list {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #333;
+  padding-left: 18px;
+}
+
+.app-settings-manual-list li {
+  margin-bottom: 4px;
+}
+
+/* ------------------------------------------------------------------
+   Suggestion #4: tray-style balloon notifications, anchored near
+   the taskbar clock (bottom-right), matching the XP "balloon tip"
+   visual pattern (small icon + bold title + body text + inline
+   links, white background, blue accent header).
+   ------------------------------------------------------------------ */
+
+.prism-notification-layer {
+  position: fixed;
+  right: 8px;
+  bottom: calc(var(--taskbar-height) + 10px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  z-index: 999996;
+  pointer-events: none;
+}
+
+.prism-notification {
+  pointer-events: auto;
+  width: 280px;
+  background: #ffffff;
+  border: 1px solid #5a8fd4;
+  border-radius: 4px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
+  font-family: var(--ui-font, Tahoma, Verdana, Arial, sans-serif);
+  overflow: hidden;
+  animation: prism-notification-in 0.2s ease-out;
+}
+
+.prism-notification.dismissing {
+  animation: prism-notification-out 0.2s ease-in forwards;
+}
+
+@keyframes prism-notification-in {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes prism-notification-out {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(12px); opacity: 0; }
+}
+
+.prism-notification-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 8px 4px 10px;
+  background: linear-gradient(to bottom, #eef5fd, #ffffff);
+}
+
+.prism-notification-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #3d94f2;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  position: relative;
+}
+
+/* Generic "info" fallback glyph shown when no custom icon (or an
+   unresolved one) is supplied — a small "i", matching the reference
+   image's default balloon icon style. Hidden once a real custom
+   image is successfully resolved (see .has-custom-icon below). */
+.prism-notification-icon::after {
+  content: "i";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  font-style: italic;
+  font-family: Georgia, serif;
+}
+
+.prism-notification-icon.has-custom-icon {
+  background-color: transparent;
+}
+
+.prism-notification-icon.has-custom-icon::after {
+  content: "";
+}
+
+.prism-notification-title {
+  flex: 1;
+  font-size: 12px;
+  font-weight: bold;
+  color: #0a246a;
+}
+
+.prism-notification-close {
+  border: none;
+  background: transparent;
+  color: #888;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 4px;
+  flex-shrink: 0;
+}
+
+.prism-notification-close:hover {
+  color: #c0392b;
+}
+
+.prism-notification-body {
+  padding: 2px 12px 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #222;
+}
+
+.prism-notification-links {
+  padding: 0 12px 10px;
+  font-size: 12px;
+}
+
+.prism-notification-link {
+  color: #1a4fae;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.prism-notification-link:hover {
+  color: #0c5dd6;
+}

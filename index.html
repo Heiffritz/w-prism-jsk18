@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Windows Prism JSK</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!--
+    SUGGESTION #4: notificationService.js adds tray-style balloon
+    notifications anchored near the taskbar clock, and
+    welcomeNotification.js shows a one-time "Welcome to ..." balloon
+    on first-ever visit (tracked via its own localStorage flag,
+    separate from session.js's window/theme persistence), re-
+    triggerable afterward from Settings. Custom logo support comes
+    from the existing AssetManager pipeline (icon.welcome key, drop a
+    real PNG into assets/icons/welcome.png).
+  -->
+
+  <!-- ===================== CORE (Phase 1-2) ===================== -->
+  <script src="js/core/eventBus.js"></script>
+  <script src="js/core/processManager.js"></script>
+
+  <!-- ===================== RESOURCE LAYER (Phase 4) ===================== -->
+  <script src="js/core/assetManager.js"></script>
+  <script src="js/core/vfs.js"></script>
+
+  <!-- ===================== UI POLISH (Phase 8) ===================== -->
+  <script src="js/ui/themeManager.js"></script>
+  <script src="js/ui/animations.js"></script>
+  <script src="js/runtime/bootloader.js"></script>
+
+  <script src="js/core/windowManager.js"></script>
+
+  <!-- ===================== RUNTIME UI (Phase 3) ===================== -->
+  <script src="js/runtime/contextMenuEngine.js"></script>
+  <script src="js/runtime/desktopEngine.js"></script>
+  <script src="js/runtime/taskbarEngine.js"></script>
+  <script src="js/runtime/startMenuEngine.js"></script>
+
+  <!-- ===================== SERVICES ===================== -->
+  <script src="js/services/notificationService.js"></script>
+  <script src="js/services/welcomeNotification.js"></script>
+
+  <!-- ===================== SESSION PERSISTENCE (Phase 9) ===================== -->
+  <script src="js/core/session.js"></script>
+
+  <script src="js/core/kernel.js"></script>
+
+  <!-- ===================== APPS (Phase 5) ===================== -->
+  <script src="js/apps/about.app.js"></script>
+  <script src="js/apps/projects.app.js"></script>
+  <script src="js/apps/skills.app.js"></script>
+  <script src="js/apps/contact.app.js"></script>
+
+  <!-- ===================== MEDIA APPS (Phase 6) ===================== -->
+  <script src="js/apps/gallery.app.js"></script>
+  <script src="js/apps/certificates.app.js"></script>
+
+  <!-- ===================== MINIGAME (Phase 7) ===================== -->
+  <script src="js/apps/minigame.app.js"></script>
+
+  <!-- ===================== SETTINGS (UI overhaul) ===================== -->
+  <script src="js/apps/settings.app.js"></script>
+
+  <!-- ===================== ENTRY POINT ===================== -->
+  <script src="js/main.js"></script>
+
+</body>
+</html>

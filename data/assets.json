@@ -1,0 +1,54 @@
+{
+  "_comment": "Symbolic asset keys -> file paths. Apps and UI modules NEVER hardcode a raw path like 'assets/icons/about.png'. They ask AssetManager.getAsset('icon.about') (or emit asset:get) and receive whatever this file currently points to. Swapping an icon, wallpaper, or sound later is a one-line change here, not a hunt through every app file. Categories below (icons/wallpapers/images/sounds/documents) exist purely for human readability when editing this file -- AssetManager flattens them into one lookup map internally, so keys must be unique across the whole file, not just within a category.",
+
+  "icons": {
+    "icon.about": "assets/icons/about.png",
+    "icon.projects": "assets/icons/projects.png",
+    "icon.skills": "assets/icons/skills.png",
+    "icon.certificates": "assets/icons/certificates.png",
+    "icon.gallery": "assets/icons/gallery.png",
+    "icon.explorer": "assets/icons/explorer.png",
+    "icon.contact": "assets/icons/contact.png",
+    "icon.minigame": "assets/icons/minigame.png",
+    "icon.settings": "assets/icons/settings.png",
+    "icon.welcome": "assets/icons/welcome.png",
+    "icon.folder": "assets/icons/folder.png",
+    "icon.file": "assets/icons/file.png",
+    "icon.pdf": "assets/icons/pdf.png",
+    "icon.image": "assets/icons/image.png"
+  },
+
+  "wallpapers": {
+    "wallpaper.bliss": "assets/wallpapers/bliss.png",
+    "wallpaper.woe": "assets/wallpapers/woe.png",
+    "wallpaper.anguish": "assets/wallpapers/anguish.png",
+    "wallpaper.error": "assets/wallpapers/error.png",
+    "wallpaper.wonder": "assets/wallpapers/wonder.png",
+    "wallpaper.absurd": "assets/wallpapers/absurd.png",
+    "wallpaper.relief": "assets/wallpapers/relief.png",
+    "wallpaper.window": "assets/wallpapers/window.png",
+    "wallpaper.hope": "assets/wallpapers/hope.png",
+    "wallpaper.prism": "assets/wallpapers/prism.png"
+  },
+
+  "images": {
+    "image.placeholder": "assets/images/placeholder.png",
+    "image.gallery_1": "assets/images/gallery_1.jpg",
+    "image.gallery_2": "assets/images/gallery_2.jpg",
+    "image.gallery_3": "assets/images/gallery_3.jpg",
+    "image.gallery_4": "assets/images/gallery_4.jpg"
+  },
+
+  "sounds": {
+    "sound.startup": "assets/sounds/startup.mp3",
+    "sound.shutdown": "assets/sounds/shutdown.mp3",
+    "sound.error": "assets/sounds/error.mp3",
+    "sound.notify": "assets/sounds/notify.mp3",
+    "sound.click": "assets/sounds/click.mp3"
+  },
+
+  "documents": {
+    "pdf.certificate_sample": "assets/pdf/certificate_sample.pdf",
+    "pdf.certificate_course": "assets/pdf/certificate_course.pdf"
+  }
+}

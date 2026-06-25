@@ -1,0 +1,59 @@
+{
+  "_comment": "A simulated file system tree, NOT real disk access (browsers can't do that). VFS.js loads this once and exposes it via resolve()/listDir()/readFile(). Every 'file' node either points to an assetKey (resolved later through AssetManager, e.g. for a PDF or image file) or carries inline 'content' for simple text files. Nothing in here is a raw hardcoded asset path.",
+
+  "type": "folder",
+  "name": "root",
+  "children": [
+    {
+      "type": "folder",
+      "name": "My Computer",
+      "children": [
+        {
+          "type": "folder",
+          "name": "Documents",
+          "children": [
+            {
+              "type": "folder",
+              "name": "Certificates",
+              "children": [
+                {
+                  "type": "file",
+                  "name": "Sample Certificate.pdf",
+                  "fileType": "pdf",
+                  "assetKey": "pdf.certificate_sample"
+                }
+              ]
+            },
+            {
+              "type": "file",
+              "name": "Read Me.txt",
+              "fileType": "text",
+              "content": "Windows Prism JSK\n\nThis is a simulated file system used to power the Explorer app. Nothing here touches your real computer's disk -- it is in-memory data loaded once from data/vfs.json."
+            }
+          ]
+        },
+        {
+          "type": "folder",
+          "name": "Pictures",
+          "children": [
+            {
+              "type": "folder",
+              "name": "Gallery",
+              "children": []
+            }
+          ]
+        },
+        {
+          "type": "folder",
+          "name": "Projects",
+          "children": []
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Desktop",
+      "children": []
+    }
+  ]
+}
