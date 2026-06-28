@@ -71,24 +71,22 @@
         <div class="app-about-header">
           <div class="app-about-avatar">★</div>
           <div>
-            <div class="app-about-name">Your Name Here</div>
-            <div class="app-about-role">Software Developer &amp; Designer</div>
+            <div class="app-about-name">Adhiloka Muara Bagja</div>
+            <div class="app-about-role">Game Developer &amp; Designer</div>
           </div>
         </div>
         <div class="app-about-body">
           <p>
-            Welcome to <strong>Windows Prism JSK</strong> — a portfolio
-            built as a simulated operating system, running entirely in
-            your browser. Every window, icon, and menu you see is part
-            of a small custom OS engine: a kernel, an event bus, a
-            process manager, and a window manager, all written in
-            plain HTML, CSS, and JavaScript.
+            Hello! I'm a creative developer and digital artist with a passion for building experiences, especially within the Minecraft community. My primary work revolves around creating <strong>3D models</strong> and <strong>pixel art</strong>, where I enjoy turning ideas into polished, game-ready assets that fit naturally into Minecraft's unique visual style. Whether it's custom blocks, items, entities, or textures, I love experimenting with new concepts and bringing them to life.
           </p>
           <p>
-            Use the desktop icons or the Start menu to explore —
-            Projects, Skills, and Contact are all real running
-            "applications" inside this simulated OS, each with their
-            own window you can move, minimize, and close.
+            Beyond art, I also enjoy <strong>game design</strong>, particularly designing gameplay mechanics, systems, and overall concepts. I like exploring how different features interact with one another to create engaging and satisfying player experiences. From brainstorming ideas to planning complete gameplay loops, I enjoy the creative process just as much as the final result.
+          </p>
+          <p>
+            I'm also expanding my skills as a programmer. I have junior-level experience with <strong>JavaScript</strong>, <strong>TypeScript</strong>, <strong>HTML</strong>, and <strong>CSS</strong>, allowing me to build interactive web projects and prototype ideas that combine both design and functionality. I enjoy learning new technologies and continuously improving my technical abilities while working on personal and collaborative projects.
+          </p>
+          <p>
+            I occasionally open commissions for custom work, although they're <strong>currently closed</strong>. If you're interested in working with me in the future, be sure to stay updated for commission announcements, project updates, and new creations. Until then, feel free to explore my portfolio and see what I've been working on.
           </p>
         </div>
         <div class="app-about-footer">

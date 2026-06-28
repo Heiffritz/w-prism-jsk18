@@ -19,15 +19,15 @@
   const SKILL_CATEGORIES = [
     {
       category: "Languages",
-      items: ["JavaScript", "HTML5", "CSS3", "Python"]
+      items: ["JavaScript", "HTML5", "CSS3", "TypeScript", "Python"]
     },
     {
       category: "Tools & Platforms",
-      items: ["Git", "VS Code", "Node.js", "Linux"]
+      items: ["Git", "VS Code", "Node.js", "Claude AI", "ChatGPT", "Blockbench", "Canva", "GitHub", "Vercel", "Krita"]
     },
     {
       category: "Concepts",
-      items: ["Event-driven architecture", "Component design", "Responsive UI", "API integration"]
+      items: ["Event-driven architecture", "Component design", "Responsive UI", "API integration", "Game Design", "Concept Art", "Pixel Art", "3D Model"]
     }
   ];
 

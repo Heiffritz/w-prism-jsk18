@@ -23,17 +23,23 @@
       tags: ["JavaScript", "Architecture", "Event-driven"]
     },
     {
-      id: "project-two",
-      title: "Project Two",
-      blurb: "Describe a second project here — what it does, what problem it solves.",
-      tags: ["Tag A", "Tag B"]
+      id: "warm-soup",
+      title: "Warm Soup",
+      blurb: "Warm Soup is a point-and-click narrative psychological horror game that follows a child simply wishing to return home for a warm bowl of soup, while the world around him slowly unravels. Featuring realistic photography layered with retro-inspired dithering effects, the game blends nostalgic visuals with unsettling storytelling to create an eerie, emotionally driven experience.",
+      tags: ["Game Project", "Artist", "Game Design", "Godot"]
     },
     {
-      id: "project-three",
-      title: "Project Three",
-      blurb: "Describe a third project here — link out, add screenshots, whatever fits.",
-      tags: ["Tag C", "Tag D"]
-    }
+      id: "3d-models",
+      title: "3D Models",
+      blurb: "A collection of custom 3D models created primarily for Minecraft-related projects, ranging from blocks, items, and entities to other game-ready assets. The gallery continues to grow over time, so be sure to check out the 3D Models section to explore my latest creations.",
+      tags: ["3D Model", "Personal Project", "Commission", "Pixel Art", "Low-Poly"]
+    },
+    {
+      id: "untitled-game-project",
+      title: "Untitled Game Project (Heavy WIP)",
+      blurb: "An experimental game currently in heavy development, centered around a combat system that rewards calculated aggression over passive defense. Instead of relying solely on dodging, players build momentum through precise attacks and well-timed decisions, creating opportunities to break through an opponent's defenses. The project is still undergoing significant iteration, with mechanics, visuals, and overall gameplay actively evolving.",
+      tags: ["Personal Project", "Game Project", "Game Design", "Pixel Art", "Low-Poly"]
+    },
   ];
 
   // See about.app.js for why registration must wait for

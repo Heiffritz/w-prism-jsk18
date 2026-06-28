@@ -50,9 +50,9 @@
     contentEl.innerHTML = `
       <div class="app-contact">
         <div class="app-contact-info">
-          <p><strong>Email:</strong> you@example.com</p>
-          <p><strong>GitHub:</strong> github.com/yourusername</p>
-          <p><strong>LinkedIn:</strong> linkedin.com/in/yourusername</p>
+          <p><strong>Email:</strong> schlokanovsky@gmail.com</p>
+          <p><strong>GitHub:</strong> github.com/S-Jouskaa</p>
+          <p><strong>LinkedIn:</strong> linkedin.com/in/adhilokaaa</p>
         </div>
         <hr class="app-contact-divider" />
         <form class="app-contact-form" novalidate>
