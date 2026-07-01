@@ -302,11 +302,29 @@ class ThemeManager {
       const unsub = this.bus.on("asset:resolved", (payload) => {
         if (payload.requestId !== requestId) return;
         unsub();
-        // CSS url() needs the path wrapped in quotes to safely
-        // handle any spaces/special characters in a filename.
-        root.style.setProperty("--desktop-bg-override", `url("${payload.path}") center center / cover no-repeat`);
-        this.currentWallpaper = wallpaperName;
-        this.bus.emit("wallpaper:applied", { wallpaper: this.currentWallpaper });
+
+        // Probe the real file before committing to it as the desktop
+        // background — CSS has no load-failure event for
+        // background-image, so without this, a missing/misnamed file
+        // would silently leave the desktop showing nothing useful
+        // with no indication why (the exact bug reported: wallpapers
+        // dropped into assets/wallpapers/ "don't work").
+        const probe = new Image();
+        probe.onload = () => {
+          // CSS url() needs the path wrapped in quotes to safely
+          // handle any spaces/special characters in a filename.
+          root.style.setProperty("--desktop-bg-override", `url("${payload.path}") center center / cover no-repeat`);
+          this.currentWallpaper = wallpaperName;
+          this.bus.emit("wallpaper:applied", { wallpaper: this.currentWallpaper });
+        };
+        probe.onerror = () => {
+          console.warn(
+            `[ThemeManager] Wallpaper "${wallpaperName}" is registered but the file could not be loaded from "${payload.path}". ` +
+            `Check the file exists at that exact path/name (case-sensitive, must match the extension in data/assets.json) and that the page is being served over http(s):// rather than opened via file://.`
+          );
+          this.bus.emit("wallpaper:loadFailed", { wallpaper: wallpaperName, path: payload.path });
+        };
+        probe.src = payload.path;
       });
       this.bus.emit("asset:get", { key: preset.value, requestId });
       return;

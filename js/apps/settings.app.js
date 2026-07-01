@@ -188,9 +188,27 @@
         if (payload.requestId !== requestId) return;
         unsub();
         if (payload.found) {
-          swatchPreviewEl.style.backgroundImage = `url("${payload.path}")`;
-          swatchPreviewEl.style.backgroundSize = "cover";
-          swatchPreviewEl.style.backgroundPosition = "center";
+          // CSS background-image has no load-failure event, so probe
+          // with a real Image() first — this is what lets us tell the
+          // difference between "key not registered" (silent, expected)
+          // and "key registered but the actual file is missing/
+          // misnamed/wrong extension" (a real problem worth a clear
+          // console message, since this exact confusion was reported
+          // as a bug: wallpapers dropped into assets/wallpapers/ not
+          // appearing, with no indication of why).
+          const probe = new Image();
+          probe.onload = () => {
+            swatchPreviewEl.style.backgroundImage = `url("${payload.path}")`;
+            swatchPreviewEl.style.backgroundSize = "cover";
+            swatchPreviewEl.style.backgroundPosition = "center";
+          };
+          probe.onerror = () => {
+            console.warn(
+              `[Settings] Wallpaper "${opt.value}" is registered (key "${opt.assetKey}") but the file could not be loaded from "${payload.path}". ` +
+              `Check that the file exists at that exact path/name (case-sensitive) and is being served over http(s):// rather than opened via file://.`
+            );
+          };
+          probe.src = payload.path;
         }
       };
       const unsub = ctx.on("asset:resolved", handler);

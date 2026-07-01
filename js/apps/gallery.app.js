@@ -27,11 +27,13 @@
   const APP_ID = "gallery";
 
   const GALLERY_ITEMS = [
-    { id: "g1", assetKey: "image.gallery_1", caption: "Gallery Image 1" },
-    { id: "g2", assetKey: "image.gallery_2", caption: "Gallery Image 2" },
-    { id: "g3", assetKey: "image.gallery_3", caption: "Gallery Image 3" },
-    { id: "g4", assetKey: "image.gallery_4", caption: "Gallery Image 4" }
+    { id: "g1", assetKey: "image.gallery_1", caption: "Gallery Image 1", category: "3D Models" },
+    { id: "g2", assetKey: "image.gallery_2", caption: "Gallery Image 2", category: "Pixel Art" },
+    { id: "g3", assetKey: "image.gallery_3", caption: "Gallery Image 3", category: "Game Projects" },
+    { id: "g4", assetKey: "image.gallery_4", caption: "Gallery Image 4", category: "3D Models" }
   ];
+
+  const CATEGORIES = ["All", "3D Models", "Pixel Art", "Game Projects"];
 
   window.eventBus.on("kernel:ready", () => {
     window.eventBus.emit("process:registerApp", {
@@ -48,7 +50,19 @@
       if (payload.pid !== ctx.pid) return;
       unsubscribe();
       ctx.setWindowId(payload.windowId);
-      renderGallery(payload.contentEl, ctx);
+      const initialCategory = (ctx.args && CATEGORIES.includes(ctx.args.category)) ? ctx.args.category : "All";
+      renderGallery(payload.contentEl, ctx, initialCategory);
+
+      // Single-instance apps don't re-run their factory on a repeat
+      // spawn (ProcessManager just focuses the existing window) — so
+      // a second "open Gallery to category X" request while it's
+      // already running can't reach us via ctx.args again. This
+      // listens for that case directly instead.
+      ctx.on("gallery:setCategory", ({ category }) => {
+        if (!CATEGORIES.includes(category)) return;
+        const tabEl = payload.contentEl.querySelector(`.app-gallery-tab[data-category="${category}"]`);
+        if (tabEl) tabEl.click();
+      });
     });
 
     ctx.emit("window:create", {
@@ -59,9 +73,14 @@
     });
   }
 
-  function renderGallery(contentEl, ctx) {
+  function renderGallery(contentEl, ctx, initialCategory) {
+    const tabsHtml = CATEGORIES.map((cat) =>
+      `<button type="button" class="app-gallery-tab${cat === initialCategory ? " active" : ""}" data-category="${cat}">${cat}</button>`
+    ).join("");
+
     contentEl.innerHTML = `
       <div class="app-gallery">
+        <div class="app-gallery-tabs">${tabsHtml}</div>
         <div class="app-gallery-grid"></div>
         <div class="app-gallery-viewer" style="display:none;">
           <button type="button" class="app-gallery-back">&larr; Back to thumbnails</button>
@@ -78,8 +97,23 @@
     const viewerImgEl = contentEl.querySelector(".app-gallery-viewer-image");
     const viewerCaptionEl = contentEl.querySelector(".app-gallery-viewer-caption");
     const backBtn = contentEl.querySelector(".app-gallery-back");
+    const tabEls = contentEl.querySelectorAll(".app-gallery-tab");
 
-    GALLERY_ITEMS.forEach((item) => {
+    function renderGrid(category) {
+      gridEl.innerHTML = "";
+      const items = category === "All" ? GALLERY_ITEMS : GALLERY_ITEMS.filter((i) => i.category === category);
+      items.forEach((item) => renderThumb(item));
+    }
+
+    tabEls.forEach((tabEl) => {
+      tabEl.addEventListener("click", () => {
+        tabEls.forEach((t) => t.classList.remove("active"));
+        tabEl.classList.add("active");
+        renderGrid(tabEl.dataset.category);
+      });
+    });
+
+    function renderThumb(item) {
       const cell = document.createElement("div");
       cell.className = "app-gallery-thumb";
       cell.dataset.itemId = item.id;
@@ -109,7 +143,9 @@
       resolveAssetKey(ctx, item.assetKey, (path) => {
         thumbImg.src = path;
       });
-    });
+    }
+
+    renderGrid(initialCategory);
 
     backBtn.addEventListener("click", () => {
       viewerEl.style.display = "none";

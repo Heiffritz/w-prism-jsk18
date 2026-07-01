@@ -39,10 +39,25 @@
   // Tunable game constants, kept together for easy adjustment.
   const MODULE_COUNT = 4; // number of clickable "system modules" in the grid
   const BASE_SEQUENCE_LENGTH = 3; // round 1 starts with a 3-step sequence
-  const BASE_TIME_PER_STEP_MS = 1800; // time budget per sequence step, decreases each round
-  const MIN_TIME_PER_STEP_MS = 700;
-  const FAKE_ERROR_MIN_DELAY_MS = 4000;
-  const FAKE_ERROR_MAX_DELAY_MS = 9000;
+  const BASE_TIME_PER_STEP_MS = 1700; // time budget per sequence step, decreases each round
+  const MIN_TIME_PER_STEP_MS = 650;
+  const FAKE_ERROR_MIN_DELAY_MS = 5000;
+  const FAKE_ERROR_MAX_DELAY_MS = 11000;
+
+  // Decoy flashes (suggestion #16): starting this round, an extra
+  // module occasionally flashes BETWEEN real sequence steps during
+  // playback — it is NOT part of the sequence and must be ignored.
+  // Adds a real attention/discrimination skill on top of pure
+  // memorization, without making the core mechanic unrecognizable.
+  const DECOY_START_ROUND = 4;
+  const DECOY_CHANCE_PER_STEP = 0.35;
+
+  // Combo scoring: consecutive perfect rounds (no wrong clicks
+  // anywhere in that round) build a small multiplier, capped so it
+  // rewards skilled play without making later rounds trivially
+  // high-scoring or punishing a single early mistake too harshly.
+  const COMBO_MULTIPLIER_STEP = 0.15;
+  const COMBO_MULTIPLIER_CAP = 2.0;
 
   const MODULE_GLYPHS = ["父", "理", "缺", "陥"];
   const MODULE_LABELS = [">MEM.SYS", ">CPU.SYS", ">I-O.SYS", ">NET.SYS"];
@@ -90,6 +105,8 @@
       this.sequence = [];
       this.playerProgress = 0;
       this.acceptingInput = false;
+      this.comboStreak = 0; // consecutive perfect (no-mistake) rounds
+      this._roundHadDecoyClick = false; // tracks whether the player clicked a decoy during THIS round's playback
 
       this._stepTimer = null;
       this._fakeErrorTimer = null;
@@ -157,6 +174,7 @@
     startGame() {
       this.round = 0;
       this.score = 0;
+      this.comboStreak = 0;
       this._renderGameScreen();
       this._scheduleFakeError();
       this._nextRound();
@@ -269,16 +287,31 @@
         const moduleIndex = this.sequence[i];
         this._flashModule(moduleIndex);
         i += 1;
+
+        // Decoy flash (suggestion #16): starting DECOY_START_ROUND,
+        // occasionally flash a DIFFERENT module right after a real
+        // step, visually distinct (amber, not green) so it reads as
+        // "noise to ignore" rather than part of the pattern. Only
+        // ever scheduled during PLAYBACK, never during the player's
+        // input turn, so it can't be mistaken for accepted input.
+        if (this.round >= DECOY_START_ROUND && Math.random() < DECOY_CHANCE_PER_STEP) {
+          const decoyPool = [...Array(MODULE_COUNT).keys()].filter((m) => m !== moduleIndex);
+          const decoyIndex = decoyPool[Math.floor(Math.random() * decoyPool.length)];
+          setTimeout(() => {
+            if (!this._destroyed) this._flashModule(decoyIndex, true);
+          }, 280);
+        }
+
         this._stepTimer = setTimeout(playStep, 550);
       };
       playStep();
     }
 
-    _flashModule(index) {
+    _flashModule(index, isDecoy) {
       const el = this.moduleEls[index];
-      el.classList.add("flash");
+      el.classList.add(isDecoy ? "decoy-flash" : "flash");
       setTimeout(() => {
-        if (!this._destroyed) el.classList.remove("flash");
+        if (!this._destroyed) el.classList.remove(isDecoy ? "decoy-flash" : "flash");
       }, 350);
     }
 
@@ -325,8 +358,24 @@
       this.playerProgress += 1;
       if (this.playerProgress >= this.sequence.length) {
         this.acceptingInput = false;
-        this.score += this.round * 10;
-        this.statusEl.textContent = "> pattern verified. advancing_";
+
+        // Combo scoring: every completed round (this method only
+        // reaches here on a fully correct round — a wrong click
+        // exits via _failRound above instead) builds the streak.
+        // Multiplier is capped so late-game scores stay sane and a
+        // single mistake doesn't feel catastrophic relative to a
+        // long perfect run.
+        this.comboStreak += 1;
+        const multiplier = Math.min(
+          1 + (this.comboStreak - 1) * COMBO_MULTIPLIER_STEP,
+          COMBO_MULTIPLIER_CAP
+        );
+        const roundScore = Math.round(this.round * 10 * multiplier);
+        this.score += roundScore;
+
+        this.statusEl.textContent = this.comboStreak > 1
+          ? `> pattern verified. combo x${multiplier.toFixed(2)}_`
+          : "> pattern verified. advancing_";
         this._stepTimer = setTimeout(() => this._nextRound(), 900);
       }
     }

@@ -54,18 +54,58 @@ class Bootloader {
     overlay.id = "prism-bootloader";
     overlay.className = "prism-bootloader";
     overlay.innerHTML = `
-      <div class="prism-bootloader-logo">
-        <span class="prism-bootloader-logo-mark">◢◤</span>
-        <span class="prism-bootloader-logo-text">Windows <strong>Prism</strong> JSK</span>
+      <div class="prism-bootloader-center">
+        <div class="prism-bootloader-logo-row">
+          <div class="prism-bootloader-flag">
+            <svg class="prism-bootloader-flag-svg" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <g transform="rotate(-18 11 11)">
+                <rect x="2" y="2" width="8" height="8" fill="#f25022" />
+                <rect x="12" y="2" width="8" height="8" fill="#7fba00" />
+                <rect x="2" y="12" width="8" height="8" fill="#00a4ef" />
+                <rect x="12" y="12" width="8" height="8" fill="#ffb900" />
+              </g>
+            </svg>
+          </div>
+          <div class="prism-bootloader-wordmark">
+            <div class="prism-bootloader-brand">Microsoft<sup>&reg;</sup></div>
+            <div class="prism-bootloader-product">Windows<span class="prism-bootloader-xp-text">xp</span></div>
+            <div class="prism-bootloader-edition">Professional</div>
+          </div>
+        </div>
+        <div class="prism-bootloader-bar">
+          <div class="prism-bootloader-bar-segment"></div>
+          <div class="prism-bootloader-bar-segment"></div>
+          <div class="prism-bootloader-bar-segment"></div>
+        </div>
       </div>
-      <div class="prism-bootloader-bar">
-        <div class="prism-bootloader-bar-fill"></div>
+      <div class="prism-bootloader-corner-bl">
+        <div>Copyright &copy; 1985-2001</div>
+        <div>Microsoft Corporation</div>
       </div>
-      <div class="prism-bootloader-status">Starting up...</div>
+      <div class="prism-bootloader-corner-br">Microsoft<sup>&reg;</sup></div>
+      <div class="prism-bootloader-status"></div>
     `;
     document.body.appendChild(overlay);
     this.overlayEl = overlay;
     this.statusEl = overlay.querySelector(".prism-bootloader-status");
+
+    // Suggestion #11: customizable logo. If a real image is
+    // registered/dropped in at the "icon.bootlogo" key, swap it in
+    // place of the built-in CSS/SVG flag — resolved through the
+    // standard asset:get/asset:resolved pattern, never a raw path.
+    // The built-in flag is the fallback shown until/unless that
+    // happens, so the boot screen never looks broken either way.
+    const flagContainer = overlay.querySelector(".prism-bootloader-flag");
+    const requestId = `bootloader-logo-${Math.random().toString(36).slice(2)}`;
+    const handler = (payload) => {
+      if (payload.requestId !== requestId) return;
+      this.bus.off("asset:resolved", handler);
+      if (payload.found) {
+        flagContainer.innerHTML = `<img src="${payload.path}" class="prism-bootloader-flag-img" alt="" />`;
+      }
+    };
+    this.bus.on("asset:resolved", handler);
+    this.bus.emit("asset:get", { key: "icon.bootlogo", requestId });
   }
 
   _bindEvents() {
